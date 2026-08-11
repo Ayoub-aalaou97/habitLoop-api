@@ -49,6 +49,12 @@ class AuthController extends Controller
 
         $user = User::where('email', $credentials['email'])->first();
 
+        if ($user && $user->password === null) {
+            return response()->json([
+                'message' => 'This account uses Google login. Please continue with Google.',
+            ], 422);
+        }
+
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             return response()->json([
                 'message' => 'The provided credentials are incorrect.',

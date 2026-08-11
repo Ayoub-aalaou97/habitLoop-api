@@ -15,3 +15,5 @@ Route::post('/login', [AuthController::class, 'login']);
 
 
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
+// Google routes moved to routes/web.php (Socialite needs session via `web` middleware)
