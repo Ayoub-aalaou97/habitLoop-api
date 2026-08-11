@@ -22,3 +22,5 @@ Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']
     ->middleware('throttle:10,1');
 
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
+// Google routes moved to routes/web.php (Socialite needs session via `web` middleware)
