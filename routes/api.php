@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\HabitCheckInController;
 use App\Http\Controllers\HabitController;
 
 Route::get('/user', function (Request $request) {
@@ -32,4 +33,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::apiResource('habits', HabitController::class);
+
+    Route::post('/habits/{habit}/check-ins', [HabitCheckInController::class, 'store']);
 });
