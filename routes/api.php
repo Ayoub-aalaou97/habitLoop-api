@@ -35,4 +35,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('habits', HabitController::class);
 
     Route::post('/habits/{habit}/check-ins', [HabitCheckInController::class, 'store']);
+    Route::get('/habits/{habit}/check-ins', [HabitCheckInController::class, 'index']);
+
 });
