@@ -23,9 +23,32 @@ class StoreHabitCheckInRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
+            'date' => [
+                'required',
+                'date_format:Y-m-d',
+                'before_or_equal:today',
+            ],
             'mood' => ['required', 'integer', 'between:1,5'],
             'note' => ['nullable', 'string', 'max:1000'],
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $date = $this->input('date');
+            if (! is_string($date)) {
+                return;
+            }
+
+            $habit = $this->user()?->habits()->find($this->route('habit'));
+            $created = $habit?->created_at?->toDateString();
+            if ($created && $date < $created) {
+                $validator->errors()->add(
+                    'date',
+                    'You cannot check in before this habit was created.',
+                );
+            }
+        });
     }
 }

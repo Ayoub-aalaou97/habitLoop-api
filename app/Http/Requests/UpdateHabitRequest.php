@@ -56,6 +56,8 @@ class UpdateHabitRequest extends FormRequest
           'integer',
           'min:1',
           'required_if:frequency_type,every_x_days,x_times_per_week,x_times_in_y_days',
+          Rule::when($this->input('frequency_type') === 'x_times_per_week', ['max:7']),
+          Rule::when($this->input('frequency_type') === 'x_times_in_y_days', ['max:31']),
         ],
 
         'frequency_period_days' => [

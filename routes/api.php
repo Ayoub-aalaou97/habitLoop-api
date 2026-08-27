@@ -36,5 +36,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/habits/{habit}/check-ins', [HabitCheckInController::class, 'store']);
     Route::get('/habits/{habit}/check-ins', [HabitCheckInController::class, 'index']);
+    Route::delete('/habits/{habit}/check-ins/{checkIn}', [HabitCheckInController::class, 'destroy']);
 
 });

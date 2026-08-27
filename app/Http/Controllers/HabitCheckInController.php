@@ -41,4 +41,13 @@ class HabitCheckInController extends Controller
 
         return response()->json($checkIn, $status);
     }
+
+    public function destroy(Request $request, int $habit, int $checkIn): Response
+    {
+        $habit = $request->user()->habits()->findOrFail($habit);
+
+        $habit->checkIns()->whereKey($checkIn)->firstOrFail()->delete();
+
+        return response()->noContent();
+    }
 }
