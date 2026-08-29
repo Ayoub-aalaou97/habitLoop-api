@@ -27,6 +27,8 @@ class User extends Authenticatable
         'password',
         'google_id',
         'email_verified_at',
+        'streak_freezes_remaining',
+        'streak_freezes_total',
     ];
 
     /**
@@ -49,11 +51,18 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'streak_freezes_remaining' => 'integer',
+            'streak_freezes_total' => 'integer',
         ];
     }
 
     public function habits(): HasMany
     {
         return $this->hasMany(Habit::class);
+    }
+
+    public function periodFreezes(): HasMany
+    {
+        return $this->hasMany(HabitPeriodFreeze::class);
     }
 }

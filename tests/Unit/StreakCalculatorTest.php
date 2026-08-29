@@ -79,4 +79,39 @@ class StreakCalculatorTest extends TestCase
         $this->assertTrue($summary['at_risk']);
         $this->assertSame(0, $summary['current_streak']);
     }
+
+    public function test_freeze_keeps_missed_daily_period_on_streak(): void
+    {
+        $today = Carbon::parse('2026-08-27')->startOfDay();
+        // Logged 25 and 27; missed 26 — freeze covers 26.
+        $calc = new StreakCalculator(
+            'day',
+            1,
+            ['2026-08-25', '2026-08-27'],
+            Carbon::parse('2026-08-20'),
+            $today,
+            ['2026-08-26'],
+        );
+
+        $summary = $calc->summarize();
+
+        $this->assertSame(3, $summary['current_streak']);
+        $this->assertSame(3, $summary['longest_streak']);
+    }
+
+    public function test_freeze_keeps_missed_week_on_streak(): void
+    {
+        $today = Carbon::parse('2026-08-27')->startOfDay(); // Thu this week (Sun 23–Sat 29)
+        // Week Sun 9–Sat 15 satisfied; week Sun 16–Sat 22 missed but frozen.
+        $calc = new StreakCalculator(
+            'week',
+            4,
+            ['2026-08-10', '2026-08-11', '2026-08-12', '2026-08-13'],
+            Carbon::parse('2026-08-10'),
+            $today,
+            ['2026-08-16'],
+        );
+
+        $this->assertSame(2, $calc->summarize()['current_streak']);
+    }
 }
