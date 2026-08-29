@@ -43,4 +43,9 @@ class Habit extends Model
         return $this->hasMany(HabitCheckIn::class);
     }
 
+    public function periodFreezes(): HasMany
+    {
+        return $this->hasMany(HabitPeriodFreeze::class);
+    }
+
 }

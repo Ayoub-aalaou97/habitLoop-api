@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\HabitCheckInController;
 use App\Http\Controllers\HabitController;
+use App\Http\Controllers\FreezeController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -37,5 +38,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/habits/{habit}/check-ins', [HabitCheckInController::class, 'store']);
     Route::get('/habits/{habit}/check-ins', [HabitCheckInController::class, 'index']);
     Route::delete('/habits/{habit}/check-ins/{checkIn}', [HabitCheckInController::class, 'destroy']);
+
+    Route::get('/freezes', [FreezeController::class, 'index']);
+    Route::post('/habits/{habit}/freezes', [FreezeController::class, 'store']);
 
 });

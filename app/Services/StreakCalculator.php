@@ -10,6 +10,7 @@ class StreakCalculator
 {
     /**
      * @param  list<string>  $dateKeys  Unique check-in dates as Y-m-d
+     * @param  list<string>  $frozenPeriodKeys  Period keys covered by freezes
      */
     public function __construct(
         private readonly string $period,
@@ -17,10 +18,19 @@ class StreakCalculator
         private readonly array $dateKeys,
         private readonly ?CarbonInterface $startedAt = null,
         private readonly ?CarbonInterface $today = null,
+        private readonly array $frozenPeriodKeys = [],
     ) {}
 
-    public static function forHabit(Habit $habit, array $dateKeys, ?CarbonInterface $today = null): self
-    {
+    /**
+     * @param  list<string>  $dateKeys
+     * @param  list<string>  $frozenPeriodKeys
+     */
+    public static function forHabit(
+        Habit $habit,
+        array $dateKeys,
+        ?CarbonInterface $today = null,
+        array $frozenPeriodKeys = [],
+    ): self {
         [$period, $target] = self::goalFromHabit($habit);
 
         return new self(
@@ -29,6 +39,7 @@ class StreakCalculator
             $dateKeys,
             $habit->created_at ? Carbon::parse($habit->created_at)->startOfDay() : null,
             $today,
+            $frozenPeriodKeys,
         );
     }
 
@@ -111,7 +122,7 @@ class StreakCalculator
 
     /**
      * @param  array<string, bool>  $dates
-     * @return array{status: string, satisfied: bool, done: int, target: int}|null
+     * @return array{status: string, satisfied: bool, done: int, target: int, key: string}|null
      */
     private function snapshot(
         CarbonInterface $date,
@@ -132,7 +143,9 @@ class StreakCalculator
         $availableDays = (int) $activeStart->diffInDays($periodEnd) + 1;
         $target = max(1, min($this->target, $availableDays));
         $done = $this->countInRange($dates, $activeStart, $periodEnd);
-        $satisfied = $done >= $target;
+        $key = $this->periodKey($date);
+        $frozen = in_array($key, $this->frozenPeriodKeys, true);
+        $satisfied = $done >= $target || $frozen;
 
         if ($activeStart->gt($today)) {
             $status = 'future';
@@ -147,7 +160,54 @@ class StreakCalculator
             'satisfied' => $satisfied,
             'done' => $done,
             'target' => $target,
+            'key' => $key,
+            'frozen' => $frozen,
         ];
+    }
+
+    /**
+     * Look up one period snapshot by key (without applying freezes).
+     *
+     * @return array{status: string, satisfied: bool, done: int, target: int, key: string}|null
+     */
+    public function snapshotForKey(string $periodKey): ?array
+    {
+        $today = ($this->today ?? now())->copy()->startOfDay();
+        $origin = ($this->startedAt ?? $today)->copy()->startOfDay();
+        $dates = array_fill_keys($this->dateKeys, true);
+
+        // Evaluate without freezes so protect() can detect a true miss.
+        $plain = new self(
+            $this->period,
+            $this->target,
+            $this->dateKeys,
+            $this->startedAt,
+            $this->today,
+            [],
+        );
+
+        $cursor = $this->startOfPeriod($origin);
+        $last = $this->startOfPeriod($today);
+
+        while ($cursor->lte($last)) {
+            $snap = $plain->snapshot($cursor, $dates, $today, $origin);
+            if ($snap !== null && $snap['key'] === $periodKey) {
+                return $snap;
+            }
+            $cursor = $this->shiftPeriod($cursor, 1);
+        }
+
+        return null;
+    }
+
+    public function periodKey(CarbonInterface $date): string
+    {
+        $start = $this->startOfPeriod($date);
+
+        return match ($this->period) {
+            'month' => $start->format('Y-m'),
+            default => $start->toDateString(),
+        };
     }
 
     /**
