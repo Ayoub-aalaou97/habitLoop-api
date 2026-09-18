@@ -73,6 +73,14 @@ class UpdateHabitRequest extends FormRequest
           'nullable',
           'date_format:H:i',
         ],
+
+        'reminder_days' => [
+          'sometimes',
+          'nullable',
+          'array',
+          'size:7',
+        ],
+        'reminder_days.*' => ['boolean'],
       ];
     }
 }

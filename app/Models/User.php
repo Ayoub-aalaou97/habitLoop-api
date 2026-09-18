@@ -29,6 +29,15 @@ class User extends Authenticatable
         'email_verified_at',
         'streak_freezes_remaining',
         'streak_freezes_total',
+        'timezone',
+        'reminder_email_enabled',
+        'reminder_push_enabled',
+        'reminder_weekly_summary',
+        'reminder_quiet_hours',
+        'quiet_hours_start',
+        'quiet_hours_end',
+        'reminder_streak_risk',
+        'reminder_freeze_suggestions',
     ];
 
     /**
@@ -53,6 +62,14 @@ class User extends Authenticatable
             'password' => 'hashed',
             'streak_freezes_remaining' => 'integer',
             'streak_freezes_total' => 'integer',
+            'reminder_email_enabled' => 'boolean',
+            'reminder_push_enabled' => 'boolean',
+            'reminder_weekly_summary' => 'boolean',
+            'reminder_quiet_hours' => 'boolean',
+            'quiet_hours_start' => 'datetime:H:i',
+            'quiet_hours_end' => 'datetime:H:i',
+            'reminder_streak_risk' => 'boolean',
+            'reminder_freeze_suggestions' => 'boolean',
         ];
     }
 
@@ -64,5 +81,10 @@ class User extends Authenticatable
     public function periodFreezes(): HasMany
     {
         return $this->hasMany(HabitPeriodFreeze::class);
+    }
+
+    public function pushSubscriptions(): HasMany
+    {
+        return $this->hasMany(PushSubscription::class);
     }
 }

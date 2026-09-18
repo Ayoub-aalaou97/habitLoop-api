@@ -21,6 +21,7 @@ class Habit extends Model
         'frequency_count',
         'frequency_period_days',
         'reminder_time',
+        'reminder_days',
         'archived_at',
     ];
 
@@ -30,6 +31,7 @@ class Habit extends Model
             'frequency_count' => 'integer',
             'frequency_period_days' => 'integer',
             'reminder_time' => 'datetime:H:i',
+            'reminder_days' => 'array',
             'archived_at' => 'datetime',
         ];
     }

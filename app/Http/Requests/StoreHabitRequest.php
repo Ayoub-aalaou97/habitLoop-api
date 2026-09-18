@@ -45,6 +45,8 @@ class StoreHabitRequest extends FormRequest
         'required_if:frequency_type,x_times_in_y_days',
       ],
       'reminder_time' => ['nullable', 'date_format:H:i'],
+      'reminder_days' => ['nullable', 'array', 'size:7'],
+      'reminder_days.*' => ['boolean'],
     ];
   }
 }
