@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Local Mailpit binary (scripts/install-mailpit.ps1)
+/tools/mailpit/mailpit.exe
+/tools/mailpit/*.zip

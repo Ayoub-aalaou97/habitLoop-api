@@ -7,6 +7,8 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\HabitCheckInController;
 use App\Http\Controllers\HabitController;
 use App\Http\Controllers\FreezeController;
+use App\Http\Controllers\ReminderController;
+use App\Http\Controllers\PushSubscriptionController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -41,5 +43,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/freezes', [FreezeController::class, 'index']);
     Route::post('/habits/{habit}/freezes', [FreezeController::class, 'store']);
+
+    Route::get('/reminders/settings', [ReminderController::class, 'settings']);
+    Route::put('/reminders/settings', [ReminderController::class, 'updateSettings']);
+    Route::post('/reminders/test', [ReminderController::class, 'test'])
+        ->middleware('throttle:10,1');
+
+    Route::get('/push/vapid-public-key', [PushSubscriptionController::class, 'vapidPublicKey']);
+    Route::post('/push/subscribe', [PushSubscriptionController::class, 'store']);
+    Route::delete('/push/subscribe', [PushSubscriptionController::class, 'destroy']);
 
 });
